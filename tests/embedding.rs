@@ -45,7 +45,7 @@ async fn test_create_embedding() {
     assert_eq!(request.input, input_text);
     assert_eq!(request.encoding_format, "float32");
 
-    let response = request_builder.create_embedding(request).await;
+    let _response = request_builder.create_embedding(request).await;
     // assert!(response.is_ok(), "Request failed: {:?}", response.err());
 
     // let embedding_response = response.unwrap();
