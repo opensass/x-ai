@@ -2,7 +2,7 @@ use std::env;
 use x_ai::client::XaiClient;
 use x_ai::embedding_get::EmbeddingModelRequestBuilder;
 use x_ai::traits::ClientConfig;
-use x_ai::traits::ModelFetcher;
+use x_ai::traits::EmbeddingModelFetcher;
 
 #[tokio::test]
 async fn test_fetch_embedding_model_info() {

@@ -10,6 +10,7 @@ use crate::embedding::EmbeddingResponse;
 use crate::embedding_get::EmbeddingModelResponse;
 use crate::embedding_mod::EmbeddingModelsResponse;
 use crate::error::XaiError;
+use crate::list_lang_mod::LanguageModelListResponse;
 use reqwest::{Method, RequestBuilder};
 
 pub trait ClientConfig {
@@ -47,6 +48,10 @@ pub trait EmbeddingModelsFetcher {
     async fn list_embedding_models(&self) -> Result<EmbeddingModelsResponse, XaiError>;
 }
 
-pub trait ModelFetcher {
+pub trait EmbeddingModelFetcher {
     async fn fetch_model_info(&self) -> Result<EmbeddingModelResponse, XaiError>;
+}
+
+pub trait ModelFetcher {
+    async fn fetch_model_info(&self) -> Result<LanguageModelListResponse, XaiError>;
 }
