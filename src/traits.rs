@@ -7,6 +7,7 @@ use crate::completions::CompletionsRequest;
 use crate::completions::CompletionsResponse;
 use crate::embedding::EmbeddingRequest;
 use crate::embedding::EmbeddingResponse;
+use crate::embedding_get::EmbeddingModelResponse;
 use crate::embedding_mod::EmbeddingModelsResponse;
 use crate::error::XaiError;
 use reqwest::{Method, RequestBuilder};
@@ -44,4 +45,8 @@ pub trait EmbeddingFetcher {
 
 pub trait EmbeddingModelsFetcher {
     async fn list_embedding_models(&self) -> Result<EmbeddingModelsResponse, XaiError>;
+}
+
+pub trait ModelFetcher {
+    async fn fetch_model_info(&self) -> Result<EmbeddingModelResponse, XaiError>;
 }
