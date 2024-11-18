@@ -2,6 +2,15 @@
 name = "x-ai"
 version = "0.0.1"
 edition = "2021"
+rust-version = "1.75"
+description = "✨ A cli, tui, and sdk for interacting with the 𝕏-AI API"
+license = "MIT"
+keywords = ["client", "xai", "grok", "ai"]
+categories = ["command-line-utilities", "science"]
+repository = "https://github.com/opensass/x-ai"
+documentation = "https://docs.rs/x-ai"
+authors = ["Mahmoud Harmouch <oss@wiseai.dev>"]
+exclude = ["tests"]
 
 [dependencies]
 reqwest = { version = "0.12.9", features = ["json", "blocking"] }
@@ -11,3 +20,15 @@ thiserror = "2.0.3"
 
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }
+
+[profile.release]
+opt-level = "z"
+debug = false
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+incremental = false
+
+[badges]
+maintenance = { status = "actively-developed" }

@@ -12,15 +12,17 @@
 
 ## 📜 Table of Contents
 
-1. [Features](#features)
-2. [Installation](#installation)
-3. [Usage Examples](#usage-examples)
+1. [Features](#-features)
+2. [Installation](#-installation)
+3. [Usage Examples](#-usage-examples)
    - [Fetch API Key Information 🔑](#fetch-api-key-information-)
    - [Chat Completions 💬](#chat-completions-)
    - [Text Completions 📝](#text-completions-)
    - [Embedding Creation 📊](#embedding-creation-)
    - [List Models 📜](#list-models-)
-4. [License](#license)
+4. [Examples](#-examples)
+5. [Contributing](#-contributing)
+6. [License](#-license)
 
 ---
 
@@ -291,6 +293,63 @@ async fn main() {
 // Model ID: grok-beta, Owned By: xai
 // Model ID: grok-vision-beta, Owned By: xai
 ```
+
+---
+
+## 📌 Examples
+
+> [!WARNING]  
+> 🚧 Under Construction
+
+This repository contains a list of notebooks examples on how to use the sdk and or the cli. To use the notebooks in this repository, you need to set up your environment. Follow these steps to get started:
+
+1. Clone the repository to your local machine:
+
+   ```sh
+   git clone https://github.com/opensass/x-ai.git
+   ```
+
+1. Install the required dependencies and libraries. Make sure you have [`Rust`](https://rustup.rs/), [`Jupyter Notebook`](https://jupyter.org/install), and [`evcxr_jupyter`](https://github.com/evcxr/evcxr/blob/main/evcxr_jupyter/README.md) installed on your system.
+
+   ```sh
+   # Install a Rust toolchain (e.g. nightly):
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
+
+   # Although not recommended, but, You may need to clean the python thing cz of new v3.12 venv breaking changes
+   sudo rm /usr/lib/python3.*/EXTERNALLY-MANAGED
+
+   # Install Jupyter Notebook
+   pip install notebook
+
+   # Install evcxr_jupyter, upgrade soon
+   cargo install evcxr_jupyter
+   evcxr_jupyter --install
+   ```
+
+1. Navigate to the cloned repository and build the project:
+
+   ```sh
+   cd x-ai
+   cargo build --release --all-features
+   ```
+
+1. Start Jupyter Notebook:
+
+   ```sh
+   jupyter notebook
+   ```
+
+1. Access the notebooks in your web browser by clicking on the notebook file you want to explore.
+
+| ID | Example | Open on GitHub | Launch on Binder | Launch on Colab |
+|----|---------------|-----------|:-------------|-------------|
+| 1  | **Basic** | [![Github](https://img.shields.io/badge/launch-Github-181717.svg?logo=github&logoColor=white)](./examples/basic.ipynb) | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/opensass/x-ai/main?filepath=examples/basic.ipynb) |  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opensass/x-ai/blob/main/examples/basic.ipynb) |
+
+---
+
+## 🤝 Contributing
+
+Contributions and feedback are welcome! If you'd like to contribute, report an issue, or suggest an enhancement, please engage with the project on [GitHub](https://github.com/opensass/x-ai). Your contributions help improve this crate for the community.
 
 ---
 
