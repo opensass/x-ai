@@ -2,56 +2,55 @@
 
 use crate::error::check_for_model_error;
 use crate::error::XaiError;
-use crate::traits::{ClientConfig, EmbeddingModelFetcher};
+use crate::traits::{ClientConfig, ModelFetcher};
+
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EmbeddingModelResponse {
+pub struct LanguageModel {
+    pub completion_text_token_price: u32,
     pub created: u64,
     pub id: String,
     pub input_modalities: Vec<String>,
     pub object: String,
+    pub output_modalities: Vec<String>,
     pub owned_by: String,
     pub prompt_image_token_price: u32,
     pub prompt_text_token_price: u32,
-    pub version: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LanguageModelListResponse {
+    pub models: Vec<LanguageModel>,
 }
 
 #[derive(Debug, Clone)]
-pub struct EmbeddingModelRequestBuilder<T: ClientConfig + Clone + Send + Sync> {
+pub struct LanguageModelRequestBuilder<T: ClientConfig + Clone + Send + Sync> {
     client: T,
-    model_id: String,
 }
 
-impl<T> EmbeddingModelRequestBuilder<T>
+impl<T> LanguageModelRequestBuilder<T>
 where
     T: ClientConfig + Clone + Send + Sync,
 {
-    pub fn new(client: T, model_id: String) -> Self {
-        Self { client, model_id }
-    }
-
-    pub fn build(self) -> Result<String, XaiError> {
-        if self.model_id.is_empty() {
-            Err(XaiError::Validation("Model ID cannot be empty".to_string()))
-        } else {
-            Ok(self.model_id)
-        }
+    pub fn new(client: T) -> Self {
+        Self { client }
     }
 }
 
-impl<T> EmbeddingModelFetcher for EmbeddingModelRequestBuilder<T>
+impl<T> ModelFetcher for LanguageModelRequestBuilder<T>
 where
     T: ClientConfig + Clone + Send + Sync,
 {
-    async fn fetch_model_info(&self) -> Result<EmbeddingModelResponse, XaiError> {
-        let url = format!("embedding-models/{}", self.model_id);
-
-        let response = self.client.request(Method::GET, &url)?.send().await?;
-
+    async fn fetch_model_info(&self) -> Result<LanguageModelListResponse, XaiError> {
+        let response = self
+            .client
+            .request(Method::GET, "language-models")?
+            .send()
+            .await?;
         if response.status().is_success() {
-            let chat_completion = response.json::<EmbeddingModelResponse>().await?;
+            let chat_completion = response.json::<LanguageModelListResponse>().await?;
             Ok(chat_completion)
         } else {
             let error_body = response.text().await.unwrap_or_else(|_| "".to_string());
