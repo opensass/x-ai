@@ -1,6 +1,8 @@
 #![allow(async_fn_in_trait)]
 
 use crate::api_key::ApiKeyInfo;
+use crate::completions::ChatCompletionRequest;
+use crate::completions::ChatCompletionResponse;
 use crate::error::XaiError;
 use reqwest::{Method, RequestBuilder};
 
@@ -12,4 +14,11 @@ pub trait ClientConfig {
 
 pub trait ApiKeyFetcher {
     async fn fetch_api_key_info(&self) -> Result<ApiKeyInfo, XaiError>;
+}
+
+pub trait ChatCompletionsFetcher {
+    async fn create_chat_completion(
+        &self,
+        request: ChatCompletionRequest,
+    ) -> Result<ChatCompletionResponse, XaiError>;
 }

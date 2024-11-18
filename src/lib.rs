@@ -1,5 +1,6 @@
 pub mod api_key;
 pub mod client;
+pub mod completions;
 pub mod error;
 pub mod traits;
 
