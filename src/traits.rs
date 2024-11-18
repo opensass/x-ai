@@ -5,6 +5,8 @@ use crate::chat_compl::ChatCompletionRequest;
 use crate::chat_compl::ChatCompletionResponse;
 use crate::completions::CompletionsRequest;
 use crate::completions::CompletionsResponse;
+use crate::embedding::EmbeddingRequest;
+use crate::embedding::EmbeddingResponse;
 use crate::error::XaiError;
 use reqwest::{Method, RequestBuilder};
 
@@ -30,4 +32,11 @@ pub trait CompletionsFetcher {
         &self,
         request: CompletionsRequest,
     ) -> Result<CompletionsResponse, XaiError>;
+}
+
+pub trait EmbeddingFetcher {
+    async fn create_embedding(
+        &self,
+        request: EmbeddingRequest,
+    ) -> Result<EmbeddingResponse, XaiError>;
 }
