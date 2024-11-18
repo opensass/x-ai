@@ -3,6 +3,7 @@ pub mod chat_compl;
 pub mod client;
 pub mod completions;
 pub mod embedding;
+pub mod embedding_mod;
 pub mod error;
 pub mod traits;
 

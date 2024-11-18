@@ -1,28 +1,45 @@
 //! Reference: https://docs.x.ai/api/endpoints#completions
 
+use crate::error::check_for_model_error;
 use crate::error::XaiError;
 use crate::traits::{ClientConfig, CompletionsFetcher};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompletionsRequest {
     pub model: String,
     pub prompt: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub best_of: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub echo: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub frequency_penalty: Option<f32>,
-    pub logit_bias: Option<std::collections::HashMap<String, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logit_bias: Option<HashMap<String, i32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub logprobs: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub n: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub presence_penalty: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub seed: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stop: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub suffix: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub top_p: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<String>,
 }
 
@@ -101,7 +118,7 @@ where
         self
     }
 
-    pub fn logit_bias(mut self, logit_bias: std::collections::HashMap<String, i32>) -> Self {
+    pub fn logit_bias(mut self, logit_bias: HashMap<String, i32>) -> Self {
         self.request.logit_bias = Some(logit_bias);
         self
     }
@@ -162,6 +179,12 @@ where
     }
 
     pub fn build(self) -> Result<CompletionsRequest, XaiError> {
+        if self.request.model.trim().is_empty() {
+            return Err(XaiError::Validation("Model is required".to_string()));
+        }
+        if self.request.prompt.trim().is_empty() {
+            return Err(XaiError::Validation("Prompt is required".to_string()));
+        }
         Ok(self.request)
     }
 }
@@ -176,18 +199,22 @@ where
     ) -> Result<CompletionsResponse, XaiError> {
         let response = self
             .client
-            .request(Method::POST, "/v1/completions")?
+            .request(Method::POST, "completions")?
             .json(&request)
             .send()
             .await?;
 
         if response.status().is_success() {
-            let completions = response.json::<CompletionsResponse>().await?;
-            Ok(completions)
+            let chat_completion = response.json::<CompletionsResponse>().await?;
+            Ok(chat_completion)
         } else {
-            Err(XaiError::Http(
-                response.error_for_status().unwrap_err().to_string(),
-            ))
+            let error_body = response.text().await.unwrap_or_else(|_| "".to_string());
+
+            if let Some(model_error) = check_for_model_error(&error_body) {
+                return Err(model_error);
+            }
+
+            Err(XaiError::Http(error_body))
         }
     }
 }

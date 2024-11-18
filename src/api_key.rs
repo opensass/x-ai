@@ -1,5 +1,6 @@
 //! Reference: https://docs.x.ai/api/endpoints#api-key
 
+use crate::error::check_for_model_error;
 use crate::traits::ApiKeyFetcher;
 use crate::{error::XaiError, traits::ClientConfig};
 use serde::{Deserialize, Serialize};
@@ -46,12 +47,16 @@ where
             .await?;
 
         if response.status().is_success() {
-            let api_key_info = response.json::<ApiKeyInfo>().await?;
-            Ok(api_key_info)
+            let chat_completion = response.json::<ApiKeyInfo>().await?;
+            Ok(chat_completion)
         } else {
-            Err(XaiError::Http(
-                response.error_for_status().unwrap_err().to_string(),
-            ))
+            let error_body = response.text().await.unwrap_or_else(|_| "".to_string());
+
+            if let Some(model_error) = check_for_model_error(&error_body) {
+                return Err(model_error);
+            }
+
+            Err(XaiError::Http(error_body))
         }
     }
 }

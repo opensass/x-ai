@@ -34,7 +34,8 @@ impl ClientConfig for XaiClient {
         let builder = self
             .http_client
             .request(method, &url)
-            .header("Authorization", format!("Bearer {}", api_key));
+            .header("Authorization", format!("Bearer {}", api_key))
+            .header("Content-Type", "application/json");
         Ok(builder)
     }
 }
