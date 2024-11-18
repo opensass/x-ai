@@ -8,6 +8,7 @@ pub mod embedding_mod;
 pub mod error;
 pub mod lang_mod;
 pub mod list_lang_mod;
+pub mod list_mod;
 pub mod traits;
 
 pub const XAI_V1_URL: &str = "https://api.x.ai/v1";
