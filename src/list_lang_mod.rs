@@ -1,4 +1,4 @@
-//! Reference: https://docs.x.ai/api/endpoints#get-embedding-model
+//! Reference: https://docs.x.ai/api/endpoints#list-language-models
 
 use crate::error::check_for_model_error;
 use crate::error::XaiError;
