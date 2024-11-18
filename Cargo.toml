@@ -10,5 +10,4 @@ serde_json = "1.0.133"
 thiserror = "2.0.3"
 
 [dev-dependencies]
-mockito = "1.6.1"
 tokio = { version = "1.41.1", features = ["full"] }
