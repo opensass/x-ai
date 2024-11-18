@@ -5,37 +5,36 @@ use x_ai::client::XaiClient;
 use x_ai::traits::ClientConfig;
 
 #[tokio::test]
-async fn test_completions() {
+async fn test_create_embedding() {
     let mut server = Server::new_async().await;
 
     let mock_response = r#"
     {
-        "choices": [],
-        "created": 0,
-        "id": "",
-        "model": "",
-        "object": "",
-        "system_fingerprint": "",
-        "usage": null
+        "data": [
+            {
+                "embedding": {
+                    "Float": [0.01567895, 0.063257694, 0.045925662]
+                },
+                "index": 0,
+                "object": "embedding"
+            }
+        ],
+        "model": "v1",
+        "object": "list"
     }
     "#;
 
-    let completions_mock = server
-        .mock("POST", "/v1/completions")
+    let embedding_mock = server
+        .mock("POST", "/v1/embeddings")
         .match_header("Content-Type", "application/json")
         .match_body(Matcher::JsonString(
             r#"
             {
-                "model": "grok-beta",
-                "prompt": "What is the meaning of life?",
-                "best_of": 1,
-                "echo": false,
-                "max_tokens": 100,
-                "temperature": 0.7,
-                "n": 1,
-                "top_p": 1
+                "input": ["This is an example content to embed..."],
+                "model": "v1",
+                "encoding_format": "float"
             }
-        "#
+            "#
             .to_string(),
         ))
         .with_status(200)
@@ -52,19 +51,14 @@ async fn test_completions() {
     client.set_api_key("test-api-key".to_string());
 
     let body = json!({
-        "model": "grok-beta",
-        "prompt": "What is the meaning of life?",
-        "best_of": 1,
-        "echo": false,
-        "max_tokens": 100,
-        "temperature": 0.7,
-        "n": 1,
-        "top_p": 1
+        "input": ["This is an example content to embed..."],
+        "model": "v1",
+        "encoding_format": "float"
     });
 
     let result = client
-        .request(Method::POST, "/v1/completions")
-        .expect("body")
+        .request(Method::POST, "/v1/embeddings")
+        .expect("Failed to create request")
         .json(&body)
         .send()
         .await;
@@ -76,5 +70,5 @@ async fn test_completions() {
     let response_text = response.text().await.unwrap();
     assert_eq!(response_text, mock_response);
 
-    completions_mock.assert_async().await;
+    embedding_mock.assert_async().await;
 }
