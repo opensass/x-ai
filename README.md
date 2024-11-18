@@ -43,7 +43,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-x_ai = "0.0.1"
+x_ai = "0.0.0"
 tokio = { version = "1.41.1", features = ["full"] }
 ```
 

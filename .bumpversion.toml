@@ -1,0 +1,10 @@
+[bumpversion]
+current_version = 0.0.0
+
+[bumpversion:file:Cargo.toml]
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[bumpversion:file:README.md]
+search = 'x_ai = "{current_version}"'
+replace = 'x_ai = "{new_version}"'
