@@ -5,55 +5,42 @@ use x_ai::client::XaiClient;
 use x_ai::traits::ClientConfig;
 
 #[tokio::test]
-async fn test_chat_completions() {
+async fn test_completions_endpoint() {
     let mut server = Server::new_async().await;
 
-    let chat_completion_mock = server
-        .mock("POST", "/v1/chat/completions")
+    let mock_response = r#"
+    {
+        "choices": [],
+        "created": 0,
+        "id": "",
+        "model": "",
+        "object": "",
+        "system_fingerprint": "",
+        "usage": null
+    }
+    "#;
+
+    let completions_mock = server
+        .mock("POST", "/v1/completions")
         .match_header("Content-Type", "application/json")
-        .match_body(Matcher::JsonString(r#"
+        .match_body(Matcher::JsonString(
+            r#"
             {
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
-                    },
-                    {
-                        "role": "user",
-                        "content": "What is the answer to life and universe?"
-                    }
-                ],
                 "model": "grok-beta",
-                "stream": false,
-                "temperature": 0
+                "prompt": "What is the meaning of life?",
+                "best_of": 1,
+                "echo": false,
+                "max_tokens": 100,
+                "temperature": 0.7,
+                "n": 1,
+                "top_p": 1
             }
-        "#.to_string()))
+        "#
+            .to_string(),
+        ))
         .with_status(200)
         .with_header("Content-Type", "application/json")
-        .with_body(r#"
-            {
-              "id": "304e12ef-81f4-4e93-a41c-f5f57f6a2b56",
-              "object": "chat.completion",
-              "created": 1728511727,
-              "model": "grok-beta",
-              "choices": [
-                {
-                  "index": 0,
-                  "message": {
-                    "role": "assistant",
-                    "content": "The answer to the ultimate question of life, the universe, and everything is **42**, according to Douglas Adams science fiction series \"The Hitchhiker's Guide to the Galaxy.\" This number is often humorously referenced in discussions about the meaning of life. However, in the context of the story, the actual question to which 42 is the answer remains unknown, symbolizing the ongoing search for understanding the purpose or meaning of existence."
-                  },
-                  "finish_reason": "stop"
-                }
-              ],
-              "usage": {
-                "prompt_tokens": 24,
-                "completion_tokens": 91,
-                "total_tokens": 115
-              },
-              "system_fingerprint": "fp_3813298403"
-            }
-        "#)
+        .with_body(mock_response)
         .create_async()
         .await;
 
@@ -65,23 +52,18 @@ async fn test_chat_completions() {
     client.set_api_key("test-api-key".to_string());
 
     let body = json!({
-        "messages": [
-            {
-                "role": "system",
-                "content": "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
-            },
-            {
-                "role": "user",
-                "content": "What is the answer to life and universe?"
-            }
-        ],
         "model": "grok-beta",
-        "stream": false,
-        "temperature": 0
+        "prompt": "What is the meaning of life?",
+        "best_of": 1,
+        "echo": false,
+        "max_tokens": 100,
+        "temperature": 0.7,
+        "n": 1,
+        "top_p": 1
     });
 
     let result = client
-        .request(Method::POST, "/v1/chat/completions")
+        .request(Method::POST, "/v1/completions")
         .expect("body")
         .json(&body)
         .send()
@@ -92,33 +74,7 @@ async fn test_chat_completions() {
     assert_eq!(response.status(), 200);
 
     let response_text = response.text().await.unwrap();
-    assert_eq!(
-        response_text,
-        r#"
-            {
-              "id": "304e12ef-81f4-4e93-a41c-f5f57f6a2b56",
-              "object": "chat.completion",
-              "created": 1728511727,
-              "model": "grok-beta",
-              "choices": [
-                {
-                  "index": 0,
-                  "message": {
-                    "role": "assistant",
-                    "content": "The answer to the ultimate question of life, the universe, and everything is **42**, according to Douglas Adams science fiction series \"The Hitchhiker's Guide to the Galaxy.\" This number is often humorously referenced in discussions about the meaning of life. However, in the context of the story, the actual question to which 42 is the answer remains unknown, symbolizing the ongoing search for understanding the purpose or meaning of existence."
-                  },
-                  "finish_reason": "stop"
-                }
-              ],
-              "usage": {
-                "prompt_tokens": 24,
-                "completion_tokens": 91,
-                "total_tokens": 115
-              },
-              "system_fingerprint": "fp_3813298403"
-            }
-        "#
-    );
+    assert_eq!(response_text, mock_response);
 
-    chat_completion_mock.assert_async().await;
+    completions_mock.assert_async().await;
 }
