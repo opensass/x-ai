@@ -1,80 +1,70 @@
-use mockito::{Matcher, Server};
-use reqwest::Method;
-use serde_json::json;
+use std::env;
 use x_ai::client::XaiClient;
-use x_ai::traits::ClientConfig;
+use x_ai::completions::CompletionsRequestBuilder;
+use x_ai::traits::{ClientConfig, CompletionsFetcher};
+use x_ai::XAI_V1_URL;
 
 #[tokio::test]
-async fn test_completions() {
-    let mut server = Server::new_async().await;
-
-    let mock_response = r#"
-    {
-        "choices": [],
-        "created": 0,
-        "id": "",
-        "model": "",
-        "object": "",
-        "system_fingerprint": "",
-        "usage": null
-    }
-    "#;
-
-    let completions_mock = server
-        .mock("POST", "/v1/completions")
-        .match_header("Content-Type", "application/json")
-        .match_body(Matcher::JsonString(
-            r#"
-            {
-                "model": "grok-beta",
-                "prompt": "What is the meaning of life?",
-                "best_of": 1,
-                "echo": false,
-                "max_tokens": 100,
-                "temperature": 0.7,
-                "n": 1,
-                "top_p": 1
-            }
-        "#
-            .to_string(),
-        ))
-        .with_status(200)
-        .with_header("Content-Type", "application/json")
-        .with_body(mock_response)
-        .create_async()
-        .await;
-
+async fn test_create_completions() {
     let client = XaiClient::builder()
-        .base_url(&format!("{}/", server.url()))
+        .base_url(XAI_V1_URL)
         .build()
         .expect("Failed to build XaiClient");
 
-    client.set_api_key("test-api-key".to_string());
+    client.set_api_key(
+        env::var("XAI_API_KEY")
+            .expect("XAI_API_KEY must be set!")
+            .to_string(),
+    );
 
-    let body = json!({
-        "model": "grok-beta",
-        "prompt": "What is the meaning of life?",
-        "best_of": 1,
-        "echo": false,
-        "max_tokens": 100,
-        "temperature": 0.7,
-        "n": 1,
-        "top_p": 1
-    });
+    let request_builder = CompletionsRequestBuilder::new(
+        client.clone(),
+        "grok-beta".to_string(),
+        "What is AI?".to_string(),
+    )
+    .max_tokens(50)
+    .temperature(0.5)
+    .n(1)
+    .stop(vec!["\n".to_string()]);
 
-    let result = client
-        .request(Method::POST, "/v1/completions")
-        .expect("body")
-        .json(&body)
-        .send()
+    let request = request_builder.clone().build();
+    assert!(
+        request.is_ok(),
+        "Request builder failed: {:?}",
+        request.err()
+    );
+
+    let response = request_builder
+        .create_completions(request.expect("REASON"))
         .await;
+    assert!(response.is_ok(), "Request failed: {:?}", response.err());
 
-    assert!(result.is_ok());
-    let response = result.unwrap();
-    assert_eq!(response.status(), 200);
+    let completions = response.unwrap();
 
-    let response_text = response.text().await.unwrap();
-    assert_eq!(response_text, mock_response);
+    assert_eq!(completions.object, "text_completion");
+    assert_eq!(completions.model, "grok-beta");
+    assert!(completions.choices.len() > 0, "No choices returned");
 
-    completions_mock.assert_async().await;
+    let choice = &completions.choices[0];
+    assert!(choice.text.len() > 0, "Choice text is empty");
+    assert!(
+        matches!(choice.finish_reason.as_str(), "length" | "stop" | "null"),
+        "Unexpected finish_reason"
+    );
+
+    if let Some(usage) = &completions.usage {
+        assert!(
+            usage.prompt_tokens > 0,
+            "Prompt tokens should be greater than 0"
+        );
+        assert!(
+            usage.completion_tokens > 0,
+            "Completion tokens should be greater than 0"
+        );
+        assert_eq!(
+            usage.total_tokens,
+            usage.prompt_tokens + usage.completion_tokens,
+            "Token count mismatch"
+        );
+    }
 }

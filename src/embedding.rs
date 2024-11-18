@@ -1,3 +1,6 @@
+//! Reference: https://docs.x.ai/api/endpoints#create-embeddings
+
+use crate::error::check_for_model_error;
 use crate::error::XaiError;
 use crate::traits::{ClientConfig, EmbeddingFetcher};
 use reqwest::Method;
@@ -66,18 +69,22 @@ where
     ) -> Result<EmbeddingResponse, XaiError> {
         let response = self
             .client
-            .request(Method::POST, "/v1/embeddings")?
+            .request(Method::POST, "embeddings")?
             .json(&request)
             .send()
             .await?;
 
         if response.status().is_success() {
-            let embedding_response = response.json::<EmbeddingResponse>().await?;
-            Ok(embedding_response)
+            let chat_completion = response.json::<EmbeddingResponse>().await?;
+            Ok(chat_completion)
         } else {
-            Err(XaiError::Http(
-                response.error_for_status().unwrap_err().to_string(),
-            ))
+            let error_body = response.text().await.unwrap_or_else(|_| "".to_string());
+
+            if let Some(model_error) = check_for_model_error(&error_body) {
+                return Err(model_error);
+            }
+
+            Err(XaiError::Http(error_body))
         }
     }
 }
