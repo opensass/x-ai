@@ -1,3 +1,5 @@
+<div align="center">
+
 # ✨ 𝕏-AI
 
 ![Version](https://img.shields.io/crates/v/x_ai)
@@ -5,6 +7,10 @@
 ![License](https://img.shields.io/crates/l/x_ai)
 ![Last Commit](https://img.shields.io/github/last-commit/opensass/x-ai)
 ![Docs](https://img.shields.io/docsrs/x_ai)
+
+![banner](https://github.com/user-attachments/assets/7b420bc7-fcfe-4aa6-b79a-6dfe1a2c019b)
+
+</div>
 
 > **𝕏-AI** is a **complete SDK** and a WIP **CLI/TUI** that provides a powerful and intuitive interface to interact with the [**X-AI API**](https://docs.x.ai/api/).
 
