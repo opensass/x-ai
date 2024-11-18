@@ -10,6 +10,7 @@ use crate::embedding::EmbeddingResponse;
 use crate::embedding_get::EmbeddingModelResponse;
 use crate::embedding_mod::EmbeddingModelsResponse;
 use crate::error::XaiError;
+use crate::get_mod::ModelInfoResponse;
 use crate::lang_mod::LanguageModelDetailResponse;
 use crate::list_lang_mod::LanguageModelListResponse;
 use crate::list_mod::ReducedModelListResponse;
@@ -64,4 +65,8 @@ pub trait GetModelFetcher {
 
 pub trait ListModelFetcher {
     async fn fetch_model_info(&self) -> Result<ReducedModelListResponse, XaiError>;
+}
+
+pub trait ModelInfoFetcher {
+    async fn fetch_model_info(&self) -> Result<ModelInfoResponse, XaiError>;
 }

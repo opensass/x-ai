@@ -6,6 +6,7 @@ pub mod embedding;
 pub mod embedding_get;
 pub mod embedding_mod;
 pub mod error;
+pub mod get_mod;
 pub mod lang_mod;
 pub mod list_lang_mod;
 pub mod list_mod;
