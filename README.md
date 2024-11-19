@@ -2,6 +2,7 @@
 
 # ✨ 𝕏-AI
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/2rCDyKJRUEePhb1wtzWHqR/wCPbiPVjGAET17HXk9U2d/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/2rCDyKJRUEePhb1wtzWHqR/wCPbiPVjGAET17HXk9U2d/tree/main)
 ![Version](https://img.shields.io/crates/v/x_ai)
 ![Downloads](https://img.shields.io/crates/d/x_ai)
 ![License](https://img.shields.io/crates/l/x_ai)
