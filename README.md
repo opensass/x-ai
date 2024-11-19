@@ -7,7 +7,7 @@
 ![Downloads](https://img.shields.io/crates/d/x_ai)
 ![License](https://img.shields.io/crates/l/x_ai)
 ![Last Commit](https://img.shields.io/github/last-commit/opensass/x-ai)
-![Docs](https://img.shields.io/docsrs/x_ai)
+![Docs](https://img.shields.io/docsrs/x-ai)
 
 ![banner](https://github.com/user-attachments/assets/7b420bc7-fcfe-4aa6-b79a-6dfe1a2c019b)
 
